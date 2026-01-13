@@ -8,10 +8,10 @@
   /* =========================
      모바일 조건 (디버깅 후 다시 활성화)
      ========================= */
-  /*
+
   const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   if (!isMobile) return;
-  */
+
 
   /* =========================
      사이트 키 (도메인 기준)
@@ -87,3 +87,4 @@
     start();
   }
 })();
+
