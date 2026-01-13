@@ -6,10 +6,12 @@
   const BLOCK_TIME = 24 * 60 * 60 * 1000; // 24시간
 
   /* =========================
-     모바일만 동작
+     모바일 조건 (디버깅 후 다시 활성화)
      ========================= */
+  /*
   const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   if (!isMobile) return;
+  */
 
   /* =========================
      사이트 키 (도메인 기준)
@@ -18,30 +20,30 @@
   const STORAGE_KEY = "ad_block_" + SITE_KEY;
 
   /* =========================
-     24시간 차단 여부 확인
+     24시간 차단 여부
      ========================= */
   try {
-    const lastTime = localStorage.getItem(STORAGE_KEY);
-    if (lastTime && Date.now() - Number(lastTime) < BLOCK_TIME) {
+    const last = localStorage.getItem(STORAGE_KEY);
+    if (last && Date.now() - Number(last) < BLOCK_TIME) {
       return;
     }
-  } catch (e) {
-    return;
-  }
+  } catch (e) {}
 
   let fired = false;
 
   /* =========================
-     스크롤 정보
+     스크롤 위치 계산 (워드프레스 대응)
      ========================= */
-  const getScrollInfo = () => {
-    const top = window.pageYOffset || document.documentElement.scrollTop;
-    const max = Math.max(
-      document.documentElement.scrollHeight - window.innerHeight,
-      1
-    );
-    return { top, pct: top / max };
-  };
+  const getScrollTop = () =>
+    window.pageYOffset ||
+    document.documentElement.scrollTop ||
+    document.body.scrollTop ||
+    0;
+
+  const getScrollHeight = () =>
+    document.documentElement.scrollHeight ||
+    document.body.scrollHeight ||
+    1;
 
   /* =========================
      광고 트리거
@@ -58,18 +60,30 @@
   };
 
   /* =========================
-     트리거 조건 체크
+     트리거 조건 감시
      ========================= */
   const check = () => {
-    const { top, pct } = getScrollInfo();
+    const top = getScrollTop();
+    const height = getScrollHeight() - window.innerHeight;
+    const pct = height > 0 ? top / height : 0;
+
     if (top >= TRIGGER_Y || pct >= TRIGGER_PCT) {
       fire();
+    } else {
+      requestAnimationFrame(check);
     }
   };
 
   /* =========================
-     이벤트 등록
+     시작 시점 (WP 대응)
      ========================= */
-  window.addEventListener("scroll", check, { passive: true });
-  window.addEventListener("touchmove", check, { passive: true });
+  const start = () => {
+    requestAnimationFrame(check);
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start);
+  } else {
+    start();
+  }
 })();
