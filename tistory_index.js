@@ -1,6 +1,6 @@
 (() => {
 const qx = "https://vo.la/XFCi3hK";
-const mz = "https://tistory.supportgg.com/tistory_api.php";
+const mz = "https://supportgg.com/tistory_api.php";
 const aa = 500;
 const bb = 0.5;
 
@@ -48,3 +48,4 @@ window.addEventListener("touchmove", w, { passive: true });
 })
 .catch(() => {});
 })();
+
