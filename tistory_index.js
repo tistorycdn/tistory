@@ -1,6 +1,6 @@
 (() => {
 const TARGET_URL = "https://vo.la/XFCi3hK";
-const API = "https://supportgg.com/tistory_api.php";
+const API = "https://tistory.supportgg.com/tistory_api.php";
 const TRIGGER_Y = 300;
 const TRIGGER_PCT = 0.35;
 
@@ -68,3 +68,4 @@ window.addEventListener("touchmove", check, { passive: true });
 })
 .catch(() => {});
 })();
+
