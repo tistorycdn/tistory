@@ -78,6 +78,7 @@
           <th data-key="channel_title">채널명</th>
           <th data-key="video_title">영상제목</th>
           <th data-key="view_count">조회수</th>
+          <th data-key="orientation">형태</th>
           <th data-key="published_at">게시일</th>
           <th>링크</th>
         </tr>
@@ -127,6 +128,7 @@ function render() {
       <td>${r.channel_url ? `<a href="${r.channel_url}" target="_blank">${escapeHtml(r.channel_title)}</a>` : escapeHtml(r.channel_title)}</td>
       <td>${escapeHtml(r.video_title)}</td>
       <td class="view-count">${(r.view_count || 0).toLocaleString()}</td>
+      <td>${escapeHtml(r.orientation || '-')}</td>
       <td>${(r.published_at || '').slice(0, 10)}</td>
       <td><a href="${r.video_url}" target="_blank">보기 →</a></td>
     </tr>
